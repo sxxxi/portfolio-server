@@ -1,0 +1,13 @@
+spring:
+  profiles:
+    active: development
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 1GB
+      max-request-size: 1GB
+  h2:
+    console:
+      enabled: true
+
+

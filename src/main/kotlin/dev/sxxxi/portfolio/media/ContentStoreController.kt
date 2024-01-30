@@ -1,0 +1,26 @@
+package dev.sxxxi.portfolio.media
+
+import dev.sxxxi.portfolio.media.domain.Services
+import org.slf4j.LoggerFactory
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.multipart.MultipartFile
+import java.io.File
+
+@RestController
+@RequestMapping("/api/media")
+class ContentStoreController(
+    private val service: ContentStoreService
+) {
+
+
+    private val logger = LoggerFactory.getLogger(ContentStoreController::class.java)
+
+    @PostMapping(value = ["/", ""])
+    fun uploadImage(@RequestParam file: MultipartFile): String {
+        return service.getContent(service.storeContent(Services.PROJECTS, file))
+    }
+
+}
