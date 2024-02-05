@@ -8,13 +8,13 @@ interface ProjectService {
      * @param instance A new project instance
      * @return the created project for the client to display
      */
-    fun create(instance: Project): Project
+    fun create(instance: ProjectEntity): Project
 
     /**
      * @param instance Updated project instance
      * @return the updated project for the client to display
      */
-    fun update(instance: Project): Project
+    fun update(instance: ProjectEntity): Project
 
     /**
      * @return all project
@@ -31,5 +31,5 @@ interface ProjectService {
      * @param id ID of item to be deleted
      * @return deleted item's ID
      */
-    fun delete(id: Long): Long
+    fun deleteById(id: Long): Long
 }

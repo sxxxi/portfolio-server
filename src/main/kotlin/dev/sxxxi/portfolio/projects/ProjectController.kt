@@ -1,51 +1,67 @@
 package dev.sxxxi.portfolio.projects
 
-import dev.sxxxi.portfolio.projects.domain.Project
-import dev.sxxxi.portfolio.projects.domain.request.ProjectCreateRequest
+import dev.sxxxi.portfolio.media.ContentStoreService
+import dev.sxxxi.portfolio.media.domain.Services
+import dev.sxxxi.portfolio.projects.domain.request.ProjectDto
 import dev.sxxxi.portfolio.projects.domain.response.*
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.multipart.MultipartFile
 
 @RestController
 @RequestMapping(
     value = ["/portfolio/projects"],
     produces = ["application/json"],
 )
+@CrossOrigin(originPatterns = ["*"])
 class ProjectController(
-    private val service: ProjectService
+    private val projectService: ProjectService,
+    private val contentService: ContentStoreService
 ) {
+    private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
     @GetMapping(value = ["/", ""])
-    fun getProjects(): ProjectListResponse {
+    fun getAll(): ProjectListResponse {
         return ProjectListResponse(
-            projects = service.getAll()
+            projects = projectService.getAll()
         )
     }
 
     @GetMapping("/{id}")
-    fun getProjectById(
+    fun getById(
         @PathVariable id: Long
     ): ProjectGetResponse {
         return ProjectGetResponse(
-            service.getById(id)
+            projectService.getById(id)
         )
     }
 
     @PostMapping(value = ["/", ""])
-    fun createProject(
-        @RequestBody project: Project
+    fun create(
+        @ModelAttribute project: ProjectDto,
     ): ProjectCreateResponse {
+        val imagePaths = project.images.map { file ->
+            contentService.store(Services.PROJECTS, file)
+        }
+        val entity = ProjectEntity(
+            title = project.title,
+            description = project.description,
+            repoLink = project.repoLink,
+            deployLink = project.deployedLink,
+            imagePaths = imagePaths
+        )
+
         return ProjectCreateResponse(
-            service.create(project)
+            project = projectService.create(entity)
         )
     }
 
     @PutMapping(value = ["/", ""])
     fun update(
-        @RequestBody project: Project
+        @RequestBody project: ProjectEntity
     ): ProjectUpdateResponse {
         return ProjectUpdateResponse(
-            updated = service.update(project)
+            updated = projectService.update(project)
         )
     }
 
@@ -54,7 +70,7 @@ class ProjectController(
         @PathVariable id: Long
     ): ProjectDeleteResponse {
         return ProjectDeleteResponse(
-            service.delete(id)
+            projectService.deleteById(id)
         )
     }
 }

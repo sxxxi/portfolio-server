@@ -4,6 +4,7 @@ import dev.sxxxi.portfolio.media.domain.Services
 import org.springframework.web.multipart.MultipartFile
 
 interface ContentStoreService {
-    fun storeContent(serviceName: Services, file: MultipartFile): String
-    fun getContent(key: String): String
+    fun store(serviceName: Services, file: MultipartFile): String
+    fun get(key: String): String
+    fun delete(key: String)
 }

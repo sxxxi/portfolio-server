@@ -2,6 +2,7 @@ package dev.sxxxi.portfolio.media
 
 import com.amazonaws.regions.Regions
 import com.amazonaws.services.s3.AmazonS3ClientBuilder
+import com.amazonaws.services.s3.model.DeleteObjectRequest
 import com.amazonaws.services.s3.model.PutObjectRequest
 import dev.sxxxi.portfolio.core.config.utils.elapsed
 import dev.sxxxi.portfolio.core.config.utils.minutesFromNow
@@ -24,7 +25,7 @@ class ContentStoreServiceImpl : ContentStoreService {
     private val s3 = AmazonS3ClientBuilder.standard().withRegion(Regions.US_EAST_1).build()
     private val logger = LoggerFactory.getLogger(ContentStoreServiceImpl::class.java)
 
-    override fun storeContent(serviceName: Services, file: MultipartFile): String {
+    override fun store(serviceName: Services, file: MultipartFile): String {
         val fileSuffix = file.originalFilename?.split(".")?.get(1)
             ?: throw ContentTypeNotSupported("File suffix missing.")
         val contentType = when (file.contentType) {
@@ -59,8 +60,12 @@ class ContentStoreServiceImpl : ContentStoreService {
         }
     }
 
-    override fun getContent(key: String): String {
+    override fun get(key: String): String {
         return s3.generatePresignedUrl(BUCKET_NAME, key, minutesFromNow(PRE_SIGNED_URL_VALIDITY_MINUTES)).toString()
+    }
+
+    override fun delete(key: String) {
+        s3.deleteObject(BUCKET_NAME, key)
     }
 
     // TODO: Create a mechanism to switch S3 client region with environment variables for
