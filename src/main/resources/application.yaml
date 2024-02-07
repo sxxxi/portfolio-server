@@ -13,4 +13,6 @@ spring:
     console:
       enabled: true
 
-
+admin:
+  username: sxxxi
+  password: foobar
