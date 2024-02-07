@@ -26,8 +26,8 @@ class SecurityConfiguration {
                 it.ignoringRequestMatchers("/h2-console/**")
             }
             .authorizeHttpRequests {
-                it.requestMatchers(HttpMethod.POST, "/portfolio/projects").hasAuthority(Authority.ADMIN.authority)
-                it.anyRequest().permitAll()
+                it.requestMatchers(HttpMethod.POST, "/portfolio/projects**").hasAuthority(Authority.ADMIN.authority)
+//                it.anyRequest().permitAll()
             }
             .httpBasic {}
             .build()
