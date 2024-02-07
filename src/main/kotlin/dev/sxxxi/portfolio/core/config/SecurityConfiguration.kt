@@ -27,7 +27,7 @@ class SecurityConfiguration {
             }
             .authorizeHttpRequests {
                 it.requestMatchers(HttpMethod.POST, "/portfolio/projects**").hasAuthority(Authority.ADMIN.authority)
-//                it.anyRequest().permitAll()
+                it.anyRequest().permitAll()
             }
             .httpBasic {}
             .build()

@@ -18,6 +18,6 @@ class AdminUserBootstrap(
 
     override fun run(vararg args: String?) {
         logger.info("Register admin: ${admin.username}")
-        authenticationService.register(admin.username, admin.password)
+        authenticationService.registerAdmin(admin.username, admin.password)
     }
 }
