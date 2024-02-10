@@ -10,5 +10,5 @@ interface AuthenticationService {
 
     fun registerAdmin(username: String, password: String): String
 
-    fun login(username: String, password: String): Optional<String>
+    fun login(username: String, password: String): String
 }

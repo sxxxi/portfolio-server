@@ -1,5 +1,8 @@
 package dev.sxxxi.portfolio.auth
 
+import dev.sxxxi.portfolio.auth.jwt.JwtService
+import dev.sxxxi.portfolio.core.exception.ForbiddenException
+import dev.sxxxi.portfolio.core.exception.InternalErrorException
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.userdetails.UserDetails
@@ -12,7 +15,8 @@ import java.util.Optional
 @Service
 class AuthenticationServiceImpl(
     private val portfolioUserRepository: PortfolioUserRepository,
-    private val passwordEncoder: PasswordEncoder
+    private val passwordEncoder: PasswordEncoder,
+    private val jwtService: JwtService
 ) : UserDetailsService, AuthenticationService {
 
     private lateinit var authenticationManager: AuthenticationManager
@@ -28,7 +32,7 @@ class AuthenticationServiceImpl(
     }
 
     override fun registerUser(username: String, password: String): String {
-        return saveAndReturnJwt(PortfolioUser(
+        return saveAndReturnToken(PortfolioUser(
             username = username,
             password = passwordEncoder.encode(password),
             authorities = mutableListOf(Authority.USER)
@@ -37,33 +41,31 @@ class AuthenticationServiceImpl(
     }
 
     override fun registerAdmin(username: String, password: String): String {
-        return saveAndReturnJwt(PortfolioUser(
+        return saveAndReturnToken(PortfolioUser(
             username = username,
             password = passwordEncoder.encode(password),
             authorities = mutableListOf(Authority.USER, Authority.ADMIN)
         ))
     }
 
-    private fun saveAndReturnJwt(user: PortfolioUser): String {
-        portfolioUserRepository.save(user)
-        // TODO: RETURN JWT HERE
-        return "JWT PLACEHOLDER"
+    private fun saveAndReturnToken(user: PortfolioUser): String {
+        return portfolioUserRepository.save(user).let { ud ->
+            jwtService.issue(ud)
+        }
     }
 
-
-    override fun login(username: String, password: String): Optional<String> {
+    override fun login(username: String, password: String): String {
         val authToken = UsernamePasswordAuthenticationToken(username, password)
         val authentication = authenticationManager.authenticate(authToken)
 
         if (!authentication.isAuthenticated)
-            return Optional.empty()
+            throw ForbiddenException("You are not authenticated.")
 
         return portfolioUserRepository.findUserByUsername(username).let { oUser ->
-            if (oUser.isEmpty) return Optional.empty()
-
-            // Put authorities in JWT here
-
-            return Optional.of("JWT PLACEHOLDER")
+            if (oUser.isEmpty) {
+                throw InternalErrorException("The user repository was not able to find the user.")
+            }
+            jwtService.issue(oUser.get())
         }
     }
 
