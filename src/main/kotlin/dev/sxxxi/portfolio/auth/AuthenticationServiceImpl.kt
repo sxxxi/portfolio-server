@@ -1,70 +1,51 @@
 package dev.sxxxi.portfolio.auth
 
+import dev.sxxxi.portfolio.auth.jwt.JwtService
+import dev.sxxxi.portfolio.auth.model.PortfolioUser
+import dev.sxxxi.portfolio.auth.model.Role
+import dev.sxxxi.portfolio.auth.repository.PortfolioUserRepository
+import dev.sxxxi.portfolio.auth.repository.RoleRepository
+import dev.sxxxi.portfolio.core.exception.ConflictException
+import dev.sxxxi.portfolio.core.exception.ForbiddenException
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
-import org.springframework.security.core.userdetails.UserDetails
-import org.springframework.security.core.userdetails.UserDetailsService
-import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
-import java.util.Optional
 
 @Service
 class AuthenticationServiceImpl(
     private val portfolioUserRepository: PortfolioUserRepository,
-    private val passwordEncoder: PasswordEncoder
-) : UserDetailsService, AuthenticationService {
+    private val roleRepository: RoleRepository,
+    private val passwordEncoder: PasswordEncoder,
+    private val jwtService: JwtService,
+    private val authenticationManager: AuthenticationManager
+) : AuthenticationService {
 
-    private lateinit var authenticationManager: AuthenticationManager
-
-    override fun loadUserByUsername(username: String?): UserDetails {
-        username?.let {
-            val oUser = portfolioUserRepository.findUserByUsername(username)
-            if (oUser.isPresent) {
-                return oUser.get()
-            }
+    override fun register(username: String, password: String, roles: MutableSet<Role>) {
+        if (portfolioUserRepository.existsByUsername(username)) {
+            throw ConflictException("User already exists")
         }
-        throw UsernameNotFoundException("User with the given username not found")
-    }
 
-    override fun registerUser(username: String, password: String): String {
-        return saveAndReturnJwt(PortfolioUser(
+        // Ensure roles are saved
+        roleRepository.saveAll(roles)
+
+        portfolioUserRepository.save(
+            PortfolioUser(
             username = username,
             password = passwordEncoder.encode(password),
-            authorities = mutableListOf(Authority.USER)
-        ))
-
+            roles = roles
+        )
+        )
     }
 
-    override fun registerAdmin(username: String, password: String): String {
-        return saveAndReturnJwt(PortfolioUser(
-            username = username,
-            password = passwordEncoder.encode(password),
-            authorities = mutableListOf(Authority.USER, Authority.ADMIN)
-        ))
-    }
-
-    private fun saveAndReturnJwt(user: PortfolioUser): String {
-        portfolioUserRepository.save(user)
-        // TODO: RETURN JWT HERE
-        return "JWT PLACEHOLDER"
-    }
-
-
-    override fun login(username: String, password: String): Optional<String> {
+    override fun login(username: String, password: String): String {
         val authToken = UsernamePasswordAuthenticationToken(username, password)
         val authentication = authenticationManager.authenticate(authToken)
 
         if (!authentication.isAuthenticated)
-            return Optional.empty()
+            throw ForbiddenException("You are not authenticated.")
 
-        return portfolioUserRepository.findUserByUsername(username).let { oUser ->
-            if (oUser.isEmpty) return Optional.empty()
-
-            // Put authorities in JWT here
-
-            return Optional.of("JWT PLACEHOLDER")
-        }
+        return jwtService.issue(authentication)
     }
 
 

@@ -4,9 +4,7 @@ import dev.sxxxi.portfolio.media.ContentStoreService
 import dev.sxxxi.portfolio.projects.domain.Project
 import dev.sxxxi.portfolio.projects.exception.ProjectConflictException
 import dev.sxxxi.portfolio.projects.exception.ProjectNotFoundException
-import kotlinx.coroutines.coroutineScope
 import org.springframework.stereotype.Service
-import kotlin.coroutines.coroutineContext
 
 @Service
 class ProjectServiceImpl(
