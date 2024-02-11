@@ -8,6 +8,7 @@ import dev.sxxxi.portfolio.auth.model.Role
 import dev.sxxxi.portfolio.auth.model.RoleEnum
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.http.HttpMethod
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.ProviderManager
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider
@@ -39,9 +40,9 @@ class SecurityConfiguration {
                 it.disable()
             }
             .authorizeHttpRequests {
-//                it.requestMatchers(HttpMethod.POST, "/portfolio/projects**").hasAuthority(Authority.ADMIN.authority)
                 it.requestMatchers("/auth/**").permitAll()
-                it.requestMatchers("/portfolio/projects**").hasRole(Role(RoleEnum.ADMIN).authority)
+                it.requestMatchers(HttpMethod.POST, "/portfolio/projects**").hasRole(Role(RoleEnum.USER).authority)
+                it.requestMatchers(HttpMethod.DELETE, "/portfolio/projects**").hasRole(Role(RoleEnum.USER).authority)
                 it.anyRequest().permitAll()
             }
             .oauth2ResourceServer { oauth2 ->
