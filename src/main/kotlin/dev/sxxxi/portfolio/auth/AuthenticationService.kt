@@ -1,14 +1,8 @@
 package dev.sxxxi.portfolio.auth
 
-import java.util.*
+import dev.sxxxi.portfolio.auth.model.Role
 
 interface AuthenticationService {
-    /**
-     * This is supposed to return a JWT containing the list of Authority
-     */
-    fun registerUser(username: String, password: String): String
-
-    fun registerAdmin(username: String, password: String): String
-
+    fun register(username: String, password: String, roles: MutableSet<Role>)
     fun login(username: String, password: String): String
 }

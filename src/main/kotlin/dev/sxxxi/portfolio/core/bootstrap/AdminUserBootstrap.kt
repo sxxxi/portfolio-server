@@ -1,6 +1,8 @@
 package dev.sxxxi.portfolio.core.bootstrap
 
 import dev.sxxxi.portfolio.auth.AuthenticationService
+import dev.sxxxi.portfolio.auth.model.Role
+import dev.sxxxi.portfolio.auth.model.RoleEnum
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.boot.CommandLineRunner
@@ -18,6 +20,6 @@ class AdminUserBootstrap(
 
     override fun run(vararg args: String?) {
         logger.info("Register admin: ${admin.username}")
-        authenticationService.registerAdmin(admin.username, admin.password)
+        authenticationService.register(admin.username, admin.password, mutableSetOf(Role(RoleEnum.ADMIN), Role(RoleEnum.USER)))
     }
 }
