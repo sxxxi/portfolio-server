@@ -16,3 +16,8 @@ spring:
 admin:
   username: sxxxi
   password: foobar
+
+keys:
+  location:
+    privateKey: ./src/main/resources/keys/private.der
+    publicKey: ./src/main/resources/keys/public.der

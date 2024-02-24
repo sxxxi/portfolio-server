@@ -1,7 +1,9 @@
 package dev.sxxxi.portfolio.auth
 
 import dev.sxxxi.portfolio.auth.model.AuthRequestDTO
+import dev.sxxxi.portfolio.auth.model.LoginResponseDTO
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -12,10 +14,13 @@ class AuthController(
     private val authenticationService: AuthenticationService
 ) {
 
-    @GetMapping("/login")
+    @PostMapping("/login")
     fun login(
         @RequestBody authRequest: AuthRequestDTO
-    ): String {
-        return authenticationService.login(authRequest.username, authRequest.password)
+    ): LoginResponseDTO {
+        return LoginResponseDTO(
+            token = authenticationService.login(authRequest.username, authRequest.password)
+        )
+
     }
 }
