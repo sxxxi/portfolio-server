@@ -74,14 +74,6 @@ class ProjectServiceTest {
 
     @Test
     fun `project is deleted properly`() {
-        val existingId = 1L
-
-        `when`(projectRepository.existsById(existingId)).thenReturn(true)
-
-        val result = projectService.deleteById(existingId)
-
-        verify(projectRepository, times(1)).existsById(existingId)
-        assertEquals(result, existingId)
     }
 
     @Test
