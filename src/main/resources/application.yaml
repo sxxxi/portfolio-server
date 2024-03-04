@@ -19,5 +19,5 @@ admin:
 
 keys:
   location:
-    privateKey: ./src/main/resources/keys/private.der
-    publicKey: ./src/main/resources/keys/public.der
+    privateKey: ${JWT_PRIVATE}
+    publicKey: ${JWT_PUBLIC}
