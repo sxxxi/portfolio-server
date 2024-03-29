@@ -32,6 +32,7 @@ import java.nio.file.Files
 import java.nio.file.Paths
 import java.security.KeyFactory
 import java.security.KeyPair
+import java.security.KeyPairGenerator
 import java.security.interfaces.RSAPublicKey
 import java.security.spec.PKCS8EncodedKeySpec
 import java.security.spec.X509EncodedKeySpec
@@ -81,18 +82,22 @@ class SecurityConfiguration {
 
     @Bean
     fun keyPair(keyLocation: KeyLocation): KeyPair {
-        logger.info(keyLocation.publicKey, keyLocation.privateKey)
-        val x = PKCS8EncodedKeySpec(readFileAsBytes(keyLocation.privateKey))
-        val y = X509EncodedKeySpec(readFileAsBytes(keyLocation.publicKey))
-        val kf = KeyFactory.getInstance("RSA")
-        val privateKey = kf.generatePrivate(x)
-        val publicKey = kf.generatePublic(y)
+        try {
 
-        return KeyPair(publicKey, privateKey)
+            logger.info(keyLocation.publicKey, keyLocation.privateKey)
+            val x = PKCS8EncodedKeySpec(readFileAsBytes(keyLocation.privateKey))
+            val y = X509EncodedKeySpec(readFileAsBytes(keyLocation.publicKey))
+            val kf = KeyFactory.getInstance("RSA")
+            val privateKey = kf.generatePrivate(x)
+            val publicKey = kf.generatePublic(y)
 
-//        return KeyPairGenerator.getInstance("RSA")
-//            .apply{ initialize(4096) }
-//            .genKeyPair()
+            return KeyPair(publicKey, privateKey)
+        } catch (e: Exception) {
+            logger.error("IN DEBUG MODE. PLEASE PROVIDE KEYS LATER, OK?")
+            return KeyPairGenerator.getInstance("RSA")
+                .apply{ initialize(4096) }
+                .genKeyPair()
+        }
     }
 
     private fun readFileAsBytes(path: String): ByteArray {
