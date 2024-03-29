@@ -1,17 +1,17 @@
 package dev.sxxxi.portfolio.unit.projects
 
+import dev.sxxxi.portfolio.projects.ProjectEntity
 import dev.sxxxi.portfolio.projects.ProjectRepository
 import dev.sxxxi.portfolio.projects.ProjectService
 import dev.sxxxi.portfolio.projects.exception.ProjectConflictException
 import dev.sxxxi.portfolio.projects.exception.ProjectNotFoundException
-import dev.sxxxi.portfolio.projects.ProjectEntity
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import org.junit.platform.commons.logging.LoggerFactory
-import org.mockito.Mockito.*
+import org.mockito.Mockito.mock
+import org.mockito.Mockito.`when`
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.mock.mockito.MockBean
